@@ -1,4 +1,4 @@
-# promalertcadgraf
+# Monitoring Server (Prometheus, Alertmanager, Cadvisor, & Grafana)
 Install Prometheus + Alertmanager + Cadvisor + Grafana on docker container
 
 Before you started:

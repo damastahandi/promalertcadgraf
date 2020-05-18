@@ -1,0 +1,153 @@
+version: "3.8"
+services:
+ prometheus:
+  image: prom/prometheus:latest
+  container_name: prometheus
+  labels:
+   - "co.id.sugarlive.prometheus.name: Prometheus"
+   - "co.id.sugarlive.prometheus.description: Sugarlive Monitoring Server"
+  volumes:
+   - type: bind
+     source: ./prometheus/config
+     target: /etc/prometheus
+     read_only: true
+   - type: volume
+     source: prometheus-data
+     target: /prometheus
+     read_only: false
+  entrypoint: /bin/prometheus
+  command:
+   - "--config.file=/etc/prometheus/prometheus.yml"
+   - "--storage.tsdb.path=/prometheus"
+   - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+   - "--web.console.templates=/usr/share/prometheus/consoles"
+  restart: on-failure
+  ports:
+   - "9090:9090"
+  depends_on:
+  - "cadvisor"
+  networks:
+   - "monitoring"
+ cadvisor:
+  image: google/cadvisor:latest
+  container_name: cadvisor
+  privileged: true
+  labels:
+   - "co.id.sugarlive.cadvisor.name: Cadvisor"
+   - "co.id.sugarlive.cadvisor.description: Sugarlive Monitoring Server"
+  volumes:
+   - type: bind
+     source: /
+     target: /rootfs
+     read_only: true
+   - type: bind
+     source: /var/run
+     target: /var/run
+     read_only: true
+   - type: bind
+     source: /sys
+     target: /sys
+     read_only: true
+   - type: bind
+     source: /var/lib/docker
+     target: /var/lib/docker
+     read_only: true
+   - type: bind
+     source: /dev/disk
+     target: /dev/disk
+     read_only: true
+  restart: on-failure
+  ports:
+   - '8080:8080'
+  networks:
+   - "monitoring"
+ alertmanager:
+  image: prom/alertmanager:latest
+  container_name: alertmanager
+  labels:
+   - "co.id.sugarlive.prometheusalertmanager.name: Prometheus Alert Manager"
+   - "co.id.sugarlive.prometheusalertmanager.description: Sugarlive Monitoring Server"
+  volumes:
+   - type: bind
+     source: ./prometheus/alertmanager/config
+     target: /etc/alertmanager
+     read_only: false
+   - type: volume
+     source: alertmanager-data
+     target: /alertmanager
+     read_only: false
+  restart: on-failure
+  depends_on:
+   - "prometheus"
+  ports:
+   - "9093:9093"
+  networks:
+   - "monitoring"
+ grafana:
+  image: grafana/grafana:latest
+  container_name: grafana
+  labels:
+   - "co.id.sugarlive.grafana.name: Grafana"
+   - "co.id.sugarlive.grafana.description: Sugarlive Monitoring Server"
+  volumes:
+   - type: volume
+     source: grafana-data
+     target: /var/lib/grafana
+     read_only: false
+   - type: bind
+     source: ./grafana/config/grafana.ini
+     target: /etc/grafana/grafana.ini
+     read_only: false
+   - type: volume
+     source: grafana-log
+     target: /var/log/grafana
+     read_only: false
+  environment:
+   - "GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource"
+  depends_on:
+   - "prometheus"
+  restart: on-failure
+  ports:
+   - "3000:3000"
+  networks:
+   - "monitoring"
+ nginx:
+  image: nginx:latest
+  container_name: nginx-monitoring
+  volumes:
+   - type: bind
+     source: ./nginx/config/nginx.conf
+     target: /etc/nginx/nginx.conf
+     read_only: true
+  volumes:
+   - type: volume
+     source: nginx-log
+     target: /var/log/nginx
+     read_only: false
+  depends_on:
+   - "grafana"
+  ports:
+   - "80:80"
+   - "443:443"
+  networks:
+   - "monitoring"
+networks:
+ monitoring:
+  driver: bridge
+  name: monitoring
+volumes:
+ prometheus-data:
+  driver: local
+  name: prometheus-data
+ alertmanager-data:
+  driver: local
+  name: alertmanager-data
+ grafana-data:
+  driver: local
+  name: grafana-data
+ grafana-log:
+  driver: local
+  name: grafana-log
+ nginx-log:
+  driver: local
+  name: nginx-log

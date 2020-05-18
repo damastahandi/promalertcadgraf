@@ -3,9 +3,6 @@ services:
  prometheus:
   image: prom/prometheus:latest
   container_name: prometheus
-  labels:
-   - "co.id.sugarlive.prometheus.name: Prometheus"
-   - "co.id.sugarlive.prometheus.description: Sugarlive Monitoring Server"
   volumes:
    - type: bind
      source: ./prometheus/config
@@ -32,9 +29,6 @@ services:
   image: google/cadvisor:latest
   container_name: cadvisor
   privileged: true
-  labels:
-   - "co.id.sugarlive.cadvisor.name: Cadvisor"
-   - "co.id.sugarlive.cadvisor.description: Sugarlive Monitoring Server"
   volumes:
    - type: bind
      source: /
@@ -64,9 +58,6 @@ services:
  alertmanager:
   image: prom/alertmanager:latest
   container_name: alertmanager
-  labels:
-   - "co.id.sugarlive.prometheusalertmanager.name: Prometheus Alert Manager"
-   - "co.id.sugarlive.prometheusalertmanager.description: Sugarlive Monitoring Server"
   volumes:
    - type: bind
      source: ./prometheus/alertmanager/config
@@ -86,9 +77,6 @@ services:
  grafana:
   image: grafana/grafana:latest
   container_name: grafana
-  labels:
-   - "co.id.sugarlive.grafana.name: Grafana"
-   - "co.id.sugarlive.grafana.description: Sugarlive Monitoring Server"
   volumes:
    - type: volume
      source: grafana-data

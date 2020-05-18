@@ -1,4 +1,9 @@
 # promalertcadgraf
-Install Prometheus + Alertmanager + Cadvisor + Grafana using docker-compose
+Install Prometheus + Alertmanager + Cadvisor + Grafana on docker container
 
-Run docker-compose.yml with syntax: docker-compose up -d
+Before you started:
+1. You must install docker services, please refer to: https://docs.docker.com/get-docker/
+2. You must install docker compose, please refer to: https://docs.docker.com/compose/install/
+
+How to run:
+docker-compose up -d

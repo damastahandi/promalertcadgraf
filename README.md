@@ -1,5 +1,5 @@
-# Monitoring Server (Prometheus, Alertmanager, Cadvisor, & Grafana)
-Install Prometheus + Alertmanager + Cadvisor + Grafana on docker container
+# Monitoring Server (Prometheus, Alertmanager, Cadvisor, Grafana, & Nginx)
+Install Prometheus + Alertmanager + Cadvisor + Grafana + Nginx on docker container
 
 Before you started:
 1. You must install docker services, please refer to: https://docs.docker.com/get-docker/
